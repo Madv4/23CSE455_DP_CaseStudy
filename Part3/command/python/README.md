@@ -1,1 +1,0 @@
-# Command Pattern - Python Implementation
