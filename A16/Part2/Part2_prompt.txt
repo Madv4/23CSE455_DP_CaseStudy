@@ -1,0 +1,24 @@
+Part 2 — Evolution & Refactoring Analysis Prompt
+=====================================================
+
+System Architecture: Spring Cloud Microservices (Hospital Management System)
+Target Services: appointment-service, pharmacy-service, notification-service
+
+Objective:
+Execute 3 structured design pattern evolutions and refactorings across the baseline microservices:
+
+Scenario CH01: System Extension (New Service Addition)
+- Introduce `pharmacy-service` (Port 8084) registered with Eureka Discovery Server.
+- Implement Repository Pattern (`PharmacyRepo`) and REST API Controller (`PharmacyController`).
+
+Scenario CH02: Strategy Pattern Refactoring & Circuit Breaker Resilience
+- Replace rigid endpoint-bound REST calls in `appointment-service` with interchangeable `PatientValidationStrategy`.
+- Implement `RestTemplatePatientValidationStrategy` and `WebClientPatientValidationStrategy`.
+- Add Resilience4j `@CircuitBreaker(name = "patientService", fallbackMethod = "fallbackValidatePatient")` to prevent cascading failures when `patient-service` is down.
+
+Scenario CH03: Observer Pattern (Event-Driven Decoupling)
+- Implement `AppointmentCreatedEvent` extending Spring `ApplicationEvent`.
+- Introduce `AppointmentAuditObserver` with `@EventListener` to observe appointment booking events independently.
+
+Verification:
+Run unit and integration test suite verifying circuit breaker fallback, strategy execution, and event notification handling.

@@ -1,0 +1,28 @@
+================================================================================
+PART 1: DESIGN PATTERN DISCOVERY & ARCHITECTURE ANALYSIS PROMPT
+================================================================================
+TARGET SYSTEM: Hospital Management System (Spring Cloud & Microservices)
+BASELINE REPOSITORY: https://github.com/Risshhhiiii/Hospital-Management-System-Using-MicroServices-And-SpringBoot
+MICROSERVICES INSPECTED:
+  1. EurekaServer (Port 8761)
+  2. hospital-gateway (Port 9191)
+  3. auth-service (Port 8081)
+  4. patient-service (Port 8082)
+  5. appointment-service (Port 8083)
+
+--------------------------------------------------------------------------------
+PROMPT DIRECTIVE:
+--------------------------------------------------------------------------------
+Act as a Principal Software Architect and Design Pattern Specialist. Conduct a comprehensive inspection of the provided Java Spring Boot microservices codebase and extract all confirmed architectural and design patterns at both:
+  - Distributed/Framework Level (e.g., API Gateway, Service Discovery, Filter Chain)
+  - Application/GoF Level (e.g., Repository Pattern, Strategy Pattern, Layered Architecture)
+
+For each discovered pattern collaboration, fulfill the following requirements:
+1. Identify exact Pattern Name and Category (GoF / Architectural / Distributed).
+2. Detail all Participant Roles and map them to their concrete Java class/interface files.
+3. Record exact Source Locations (file paths and line numbers/ranges).
+4. Provide Evidence and Intent explaining how the pattern solves a specific architectural problem.
+5. Identify any candidate patterns that were considered but REJECTED or UNCERTAIN, citing technical evidence from the source code.
+
+Output the results formatted according to the 23CSE455 Case Study schema.
+================================================================================

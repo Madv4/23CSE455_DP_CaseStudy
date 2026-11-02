@@ -1,0 +1,7 @@
+--- a/appointment-service/src/main/java/com/infosys/appointmentservice/Observer/AppointmentAuditObserver.java
++++ b/appointment-service/src/main/java/com/infosys/appointmentservice/Observer/AppointmentAuditObserver.java
+@@ -0,0 +1,22 @@
++ // Refactored CH03: Asynchronous Event Listener (Observer Pattern)
++ @EventListener
++ @Async
++ public void onAppointmentCreated(AppointmentCreatedEvent event) { ... }

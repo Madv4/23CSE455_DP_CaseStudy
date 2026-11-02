@@ -1,0 +1,17 @@
+source_version,summary,pattern_name,count
+v1.0.0-baseline,Baseline Microservices System,Microservices Architecture,1
+v1.0.0-baseline,Baseline Microservices System,API Gateway,1
+v1.0.0-baseline,Baseline Microservices System,Service Discovery,1
+v1.0.0-baseline,Baseline Microservices System,Layered Architecture,4
+v1.0.0-baseline,Baseline Microservices System,Repository Pattern,3
+v1.0.0-baseline,Baseline Microservices System,Dependency Injection,5
+v1.0.0-baseline,Baseline Microservices System,Filter Chain,1
+v2.0.0-evolved,Evolved System with Refactoring,Microservices Architecture,1
+v2.0.0-evolved,Evolved System with Refactoring,API Gateway,1
+v2.0.0-evolved,Evolved System with Refactoring,Service Discovery,1
+v2.0.0-evolved,Evolved System with Refactoring,Layered Architecture,6
+v2.0.0-evolved,Evolved System with Refactoring,Repository Pattern,4
+v2.0.0-evolved,Evolved System with Refactoring,Dependency Injection,7
+v2.0.0-evolved,Evolved System with Refactoring,Strategy Pattern,1
+v2.0.0-evolved,Evolved System with Refactoring,Observer Pattern,1
+v2.0.0-evolved,Evolved System with Refactoring,Circuit Breaker,1
