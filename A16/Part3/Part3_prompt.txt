@@ -1,0 +1,20 @@
+Part 3 — Cross-Language Implementation Prompt & Methodology
+
+1. Objective:
+Select two key architectural design patterns (Strategy and Observer, alongside Repository) and implement equivalent, language-idiomatic standard-library implementations in four programming languages:
+- Java (Spring Cloud baseline language)
+- Python (Scripting and data science target)
+- JavaScript / Node.js (Frontend / full-stack target)
+- C++ (High-performance systems target)
+
+2. Prompts Used:
+"Implement clean, minimal, standard-library implementations of the Repository, Strategy (Fee Calculation), and Observer (Appointment Creation Event) design patterns in Java, Python, JavaScript, and C++. Ensure each implementation contains an automated test harness with assertions verifying CRUD operations, discount strategy switching, and asynchronous/callback event delivery."
+
+3. Execution Commands:
+- Java: javac Patterns.java && java Patterns
+- Python: python3 -m unittest test_patterns.py
+- JavaScript: node patterns.test.js
+- C++: g++ -std=c++17 -O2 patterns_test.cpp -o patterns_test && ./patterns_test
+
+4. Verification Status:
+All four language implementations compiled cleanly and passed 100% of assertion tests with zero external dependencies.

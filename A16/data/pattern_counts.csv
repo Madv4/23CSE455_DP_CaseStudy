@@ -1,0 +1,21 @@
+source_version,summary,pattern_name,count
+Baseline (v1.0.0),per_pattern,Microservices Architecture,1
+Baseline (v1.0.0),per_pattern,API Gateway,1
+Baseline (v1.0.0),per_pattern,Service Discovery,1
+Baseline (v1.0.0),per_pattern,Layered Architecture,1
+Baseline (v1.0.0),per_pattern,Repository,3
+Baseline (v1.0.0),per_pattern,Chain of Responsibility,1
+Baseline (v1.0.0),per_pattern,Strategy,1
+Baseline (v1.0.0),total_pattern_types,,7
+Baseline (v1.0.0),total_pattern_instances,,9
+Evolved (v2.0.0),per_pattern,Microservices Architecture,1
+Evolved (v2.0.0),per_pattern,API Gateway,1
+Evolved (v2.0.0),per_pattern,Service Discovery,1
+Evolved (v2.0.0),per_pattern,Layered Architecture,1
+Evolved (v2.0.0),per_pattern,Repository,4
+Evolved (v2.0.0),per_pattern,Chain of Responsibility,1
+Evolved (v2.0.0),per_pattern,Strategy,1
+Evolved (v2.0.0),per_pattern,Circuit Breaker,1
+Evolved (v2.0.0),per_pattern,Observer,1
+Evolved (v2.0.0),total_pattern_types,,9
+Evolved (v2.0.0),total_pattern_instances,,12

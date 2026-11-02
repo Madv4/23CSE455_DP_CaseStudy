@@ -1,0 +1,258 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=0.72in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{float}
+\hypersetup{colorlinks=true,urlcolor=black,linkcolor=black,citecolor=black}
+\setlist{nosep}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\tabcolsep}{4pt}
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{15pt}
+\sloppy
+\emergencystretch=2em
+\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,columns=fullflexible,keepspaces=true}
+\hypersetup{pdftitle={Design Pattern Analysis in a Hospital Management System Using Microservices and Spring Boot},pdfauthor={Team A16}}
+\title{\textbf{Design Pattern Analysis in a Hospital Management System Using Microservices and Spring Boot}}
+\author{Team A16\\[2mm]
+Sai Krishna --- AM.EN.U4EAC23033\\
+Siddhartha --- AM.EN.U4EAC23042\\
+Sai Rudra --- AM.EN.U4EAC23048\\
+Shradhey K --- AM.EN.U4EAC23064\\
+Pavan Sai --- AM.EN.U4EAC23025}
+\date{2026-10-29}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Application and Architecture}
+\textbf{Original source.} Repository URL above; analysis version is the ZIP snapshot supplied for this report on 2026-10-29. No immutable Git commit hash or release tag was supplied, so the snapshot cannot be identified by commit. The repository's declared license was not verified in the supplied files.\\
+\textbf{Environment.} Java 17 as stated by the README; Spring Boot, Spring Cloud Gateway, Spring Data JPA, Spring Security/JWT, Maven, PostgreSQL, and Netflix Eureka. Exact resolved dependency versions should be taken from the Maven descriptors for a reproducible build.\\
+\textbf{Scope.} Inspected README, Java source, Maven descriptors, application properties, repository/entity/controller classes, and service entry points across five modules: \path{EurekaServer}, \path{hospital-gateway}, \path{auth-service}, \path{patient-service}, and \path{appointment-service}. Part 2 is a separate proposed refactoring overlay; Part 3 examples are independent educational snippets.\\
+\textbf{Architecture.} The system has five Spring Boot applications. The gateway routes requests to auth, patient, and appointment services. Eureka supports discovery; the appointment service calls the patient service. The README/configuration indicates that the three business services use the same PostgreSQL database, \texttt{mydb}, which creates database coupling despite separate applications.
+
+\begin{center}
+\fbox{\begin{minipage}{0.91\linewidth}\centering
+Client / API consumer\\[3pt]
+$\downarrow$\\[3pt]
+Hospital API Gateway (routes and JWT filter)\\[3pt]
+$\downarrow$\\[3pt]
+Auth Service \quad Patient Service \quad Appointment Service\\[3pt]
+Eureka Server: service registration and discovery\\
+PostgreSQL: shared database configured for business services
+\end{minipage}}
+\end{center}
+\textbf{Run instructions.} The original README contains setup information. This case study did not run the entire system; therefore no end-to-end success is claimed. The commands in the package README reproduce the isolated Part 3 examples and structural tests. The Spring services should be started only after configuring database credentials, JWT secrets, and service discovery endpoints.
+
+\section{Part 1 Pattern Discovery}
+\textbf{Method.} Candidate patterns were identified by reviewing the source modules, class relationships, annotations, routes, repositories, and application properties. Findings were checked against concrete participants and interactions. Framework features were not counted as custom GoF implementations merely because their names resemble patterns.
+
+\subsection{Totals at the baseline}
+\begin{itemize}
+\item Confirmed pattern types: 6 (Microservices Architecture, API Gateway, Service Discovery, Layered Architecture, Repository, Client--Server).
+\item Confirmed pattern instances: 8 (one each for the first four listed types, three Repository collaborations, and one Client--Server collaboration).
+\item Concrete Java class/interface participants mapped in the inventory: 15; architectural roles also include configuration and module symbols.
+\item Unique participant symbols across the records: 17, with repeated symbols counted once; architecture/module participants are not all Java classes.
+\item Rejected or uncertain candidates: 4 (Strategy, Observer, Decorator, Circuit Breaker). Two qualified framework observations—Dependency Injection and singleton bean scope—are documented but excluded from the six-type count.
+\end{itemize}
+
+\subsection{Pattern inventory}
+\small
+\begin{tabularx}{\linewidth}{@{}p{1.35in}X p{0.65in}p{1.65in}@{}}
+\toprule\textbf{Pattern type} & \textbf{Instance names} & \textbf{Instances} & \textbf{Participant classes / symbols}\\\midrule
+Microservices Architecture & Hospital service decomposition & 1 & 5 service/application modules\\
+API Gateway & Inbound request routing and JWT filter & 1 & Gateway application, route config, filter\\
+Service Discovery & Eureka registration and load-balanced routing & 1 & Eureka app, service apps, route config\\
+Layered Architecture & Patient resource handling & 1 & PatientController, PatientRepo, Patient\\
+Repository & Patient persistence; appointment persistence; user persistence & 3 & PatientRepo, AppointmentRepo, UserRepo and collaborating symbols\\
+Client--Server & REST requests through gateway and service endpoints & 1 & API consumer, gateway, REST controllers\\
+\midrule\textbf{Total} & \textbf{6 distinct types} & \textbf{8} & \textbf{See scope note above}\\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\subsection{One record for each pattern instance}
+\textbf{1. Instance: Hospital service decomposition.}\\
+\textbf{Type/category:} Microservices Architecture; architectural style.\\
+\textbf{Purpose/origin:} Separate deployable applications for authentication, patients, appointments, gateway routing, and service registry.\\
+\textbf{Participant mapping:} \path{AuthServiceApplication}; \path{PatientServiceApplication}; \path{AppointmentServiceApplication}; \path{HospitalGatewayApplication}; \path{EurekaServerApplication}. Each is in its module's Java source tree.\\
+\textbf{Evidence/verification:} Independent Spring Boot entry points and module configuration support the service decomposition. Qualification: the business services share a PostgreSQL database, so independent data ownership is incomplete. Confirmed as an architectural style, not a GoF pattern.
+
+\textbf{2. Instance: Inbound request routing and JWT filter.}\\
+\textbf{Type/category:} API Gateway; distributed-systems pattern.\\
+\textbf{Purpose/origin:} Provide a common inbound routing layer and apply a JWT-related filter.\\
+\textbf{Participant mapping:} gateway application; \path{hospital-gateway/src/main/resources/application.properties}; \path{hospital-gateway/src/main/java/com/infosys/gateway/Filter/JwtAuthenticationFilter.java}.\\
+\textbf{Evidence/verification:} Route configuration maps paths to auth, patient, and appointment service IDs; the filter implements Spring Cloud Gateway's global-filter contract. Confirmed from configuration and source; live gateway behavior was not run.
+
+\textbf{3. Instance: Eureka registration and load-balanced routing.}\\
+\textbf{Type/category:} Service Discovery; distributed-systems pattern.\\
+\textbf{Purpose/origin:} Register service instances and allow service-ID-based routing.\\
+\textbf{Participant mapping:} \path{EurekaServer/.../EurekaServerApplication.java}; service application classes with discovery configuration; gateway routes using \path{lb://} service IDs; load-balanced HTTP client configuration in appointment service.\\
+\textbf{Evidence/verification:} Eureka server annotation and discovery configuration are present. Confirmed structurally; registration and routing were not verified at runtime.
+
+\textbf{4. Instance: Patient resource handling.}\\
+\textbf{Type/category:} Layered Architecture; architectural pattern.\\
+\textbf{Purpose/origin:} Separate HTTP request handling, persistence abstraction, and data representation.\\
+\textbf{Participant mapping:} \path{patient-service/.../Controller/PatientController.java}; \path{patient-service/.../Repository/PatientRepo.java}; \path{patient-service/.../Entity/Patient.java}.\\
+\textbf{Evidence/verification:} These roles reside in separate packages and collaborate through the controller/repository/entity structure. The separation is partial because business and persistence concerns remain in controllers. Confirmed with caveat.
+
+\textbf{5. Instance: Patient persistence.}\\
+\textbf{Type/category:} Repository; data-access pattern/framework abstraction.\\
+\textbf{Purpose/origin:} Provide a persistence interface for patient records.\\
+\textbf{Participant mapping:} \path{PatientRepo} extends Spring Data JPA \path{JpaRepository}; collaborating model: \path{Patient}; consumer: \path{PatientController}.\\
+\textbf{Evidence/verification:} Repository interface delegates standard persistence behavior to Spring Data JPA. Confirmed as a framework-backed Repository abstraction.
+
+\textbf{6. Instance: Appointment persistence.}\\
+\textbf{Type/category:} Repository; data-access pattern/framework abstraction.\\
+\textbf{Participant mapping:} \path{AppointmentRepo}; appointment entity; consumer: \path{AppointmentController} in the appointment service.\\
+\textbf{Evidence/verification:} The repository extends \path{JpaRepository} and is used to persist/retrieve appointment records. Confirmed as a framework-backed Repository abstraction.
+
+\textbf{7. Instance: User persistence.}\\
+\textbf{Type/category:} Repository; data-access pattern/framework abstraction.\\
+\textbf{Participant mapping:} \path{UserRepo}; user entity/model; consumer: auth controller/service code.\\
+\textbf{Evidence/verification:} The repository extends \path{JpaRepository} and abstracts user persistence operations. Confirmed as a framework-backed Repository abstraction.
+
+\textbf{8. Instance: REST requests through gateway and service endpoints.}\\
+\textbf{Type/category:} Client--Server; architectural style.\\
+\textbf{Participant mapping:} API consumer (e.g. Postman or another HTTP client); gateway route configuration; REST controllers in auth, patient, and appointment services.\\
+\textbf{Evidence/verification:} Controllers expose HTTP operations and the gateway/service clients communicate through HTTP. Confirmed from endpoints and routing configuration; end-to-end calls were not run.
+
+\subsection{Qualified, rejected, and uncertain candidates}
+\begin{itemize}
+\item \textbf{Dependency Injection / IoC — qualified, not included in the six pattern types.} Spring injects repositories, JWT services, encoders, and HTTP clients. This is an IoC principle/framework mechanism, not a custom GoF implementation. Field injection appears in the baseline.
+\item \textbf{Singleton bean scope — qualified, not included in the six pattern types.} Spring components are singleton-scoped by default unless configured otherwise. This does not establish a hand-written Singleton pattern.
+\item \textbf{Strategy — rejected for baseline.} RestTemplate and WebClient paths are separate methods; no shared strategy contract or polymorphic selection is present.
+\item \textbf{Observer — rejected for baseline.} No application-defined subject/subscriber collaboration or event-listener relationship was identified in the inspected Java source.
+\item \textbf{Decorator — not established.} Annotations and a gateway filter alone do not demonstrate a custom Decorator implementation.
+\item \textbf{Circuit Breaker — not found.} No explicit circuit-breaker implementation/configuration was established in the inspected source.
+\end{itemize}
+
+\subsection{Baseline risks and maintainability observations}
+\begin{enumerate}
+\item \path{AppointmentController} combines request handling, patient validation, downstream calls, status defaults, and persistence; appointment creation paths duplicate workflow logic.
+\item Missing records are sometimes represented by \path{null}, and delete operations use weak result semantics; consistent HTTP error mapping is needed.
+\item Database credentials and a JWT signing secret are hard-coded in source/configuration. Rotate any real exposed secrets and externalize them before deployment.
+\item Gateway configuration exposes all Actuator endpoints with a wildcard setting; restrict and protect management endpoints.
+\item A shared PostgreSQL database creates coupling between otherwise separately deployed business services.
+\item Tracing dependencies/configuration do not prove live Zipkin collection or end-to-end trace propagation; runtime verification remains outstanding.
+\end{enumerate}
+
+\section{Part 2 Evolution and Refactoring}
+The baseline snapshot remains in \path{Part1_Baseline/original_project}. Refactoring files are stored separately in \path{Part2_Refactoring/refactored_project} and the overlay/diff folders. These are proposed changes, not a verified production release.
+
+\subsection{CH01 — Service Layer extraction}
+\textbf{Change and acceptance criteria.} Move appointment use-case orchestration out of the controller. A successful create request should still validate the patient, apply the default status, persist the appointment, and return the saved result.\\
+\textbf{Before/after paths.} Before: \path{appointment-service/.../Controller/AppointmentController.java}. After: controller delegates to \path{AppointmentService}; service owns validation/persistence workflow.\\
+\textbf{Implementation and tests.} The structural test \path{test_service_layer_exists} and \path{test_controller_delegates_to_service} passed. The Spring overlay was not compiled or integration-tested.\\
+\textbf{Pattern effects.} Service Layer is newly introduced; existing API Gateway, Service Discovery, and Repository collaborations are intended to remain.\\
+\textbf{Refactoring and metrics.} Extract Method / Move Method style separation addresses a controller with multiple responsibilities and duplicated use-case flow. LOC metrics are not reported as a quality proxy; no behavior-preservation integration test has been run.
+
+\subsection{CH02 — Strategy for patient-validation transports}
+\textbf{Change and acceptance criteria.} Provide one \path{PatientValidationStrategy} contract with RestTemplate and WebClient implementations, while preserving the existing endpoint behavior.\\
+\textbf{Before/after paths.} Before: duplicated validation logic in appointment controller methods. After: \path{PatientValidationStrategy}, \path{RestTemplatePatientValidationStrategy}, and \path{WebClientPatientValidationStrategy} in the refactored appointment-service source.\\
+\textbf{Implementation and tests.} Structural check \path{test_strategy_contract_and_two_implementations_exist} passed. Runtime downstream behavior and HTTP error handling remain unverified.\\
+\textbf{Pattern effects.} Strategy is newly introduced in CH02; it is not a baseline discovery.\\
+\textbf{Refactoring and metrics.} Extracting transport-specific validation reduces duplication and isolates variation. Two strategies are justified only while both transports are supported; otherwise one transport may be simpler.
+
+\subsection{CH03 — Observer / Spring application event}
+\textbf{Change and acceptance criteria.} After successful persistence, publish an appointment-created event and let an independent listener perform audit logging. The main appointment use case should not call the audit component directly.\\
+\textbf{Before/after paths.} Before: no application-defined appointment-created event listener in the inspected baseline. After: \path{AppointmentCreatedEvent}, publication in \path{AppointmentService}, and \path{AppointmentAuditObserver} with Spring \path{@EventListener}.\\
+\textbf{Implementation and tests.} Structural checks \path{test_observer_event_and_listener_exist} and controller-delegation checks passed. Event dispatch was not integration-tested in a running Spring context.\\
+\textbf{Pattern effects.} Observer is newly introduced in CH03. It is an in-process event, not durable messaging and not a guarantee of external notification delivery.\\
+\textbf{Refactoring and metrics.} Separating audit logging reduces coupling. A transactional event/outbox or message broker would be needed for stronger delivery guarantees.
+
+\subsection{Updated pattern counts}
+\begin{tabularx}{\linewidth}{@{}p{1.1in}p{1.2in}p{1.2in}p{1.0in}Y@{}}
+\toprule\textbf{Snapshot} & \textbf{Distinct types} & \textbf{Instances} & \textbf{Participant symbols} & \textbf{Interpretation}\\\midrule
+Baseline & 6 & 8 & 17 & Original source findings only.\\
+After CH01 & 7 & 9 & 18 & Adds Service Layer collaboration; baseline patterns retained.\\
+After CH02 & 8 & 10 & 21 & Adds Strategy interface and two implementations.\\
+After CH03 & 9 & 11 & 23 & Adds event and observer participants.\\
+\bottomrule
+\end{tabularx}
+
+Counts are inventory-level counts for the named collaborations, not a universal measure of design quality. Shared participants are counted once within the unique-symbol totals. Architectural styles have module/configuration participants that are not all Java classes. The structural test suite contains five checks and all five passed; these checks do not replace Maven compilation, database integration, or end-to-end tests.\\
+\textbf{Before/after test evidence.} See \path{verification/refactoring_structural_tests.txt} and \path{evidence/verification_summary.txt}. Full integration is not verified.\\
+\textbf{Remaining limitations.} Add tests for missing patients, downstream 4xx/5xx and timeout responses, persistence failure, duplicate requests, event publication, and consistent exception-to-HTTP mapping. Avoid exposing raw exception messages.
+
+\section{Part 3 Cross-Language Comparison}
+\textbf{Selected instances.} Repository (in-memory keyed store), Strategy (standard and senior fee calculation), and Observer (appointment-created callback) were selected because they can be represented consistently across the four required languages. These are educational analogues, not production replacements for Spring Data JPA or a durable event system. The senior fee reduction is a test fixture, not a real hospital billing policy.
+
+\textbf{Common specification.} Repository: save, find, missing-key behavior, and delete. Strategy: return expected fee for standard and senior policies. Observer: registered callback receives the created appointment identifier. The same core cases are represented in Java, Python, JavaScript, and C++.
+
+\textbf{Implementations and commands.}
+\begin{itemize}
+\item Java: \path{Part3_CrossLanguage/Java/Patterns.java}; run \path{javac Patterns.java && java Patterns}.
+\item Python: \path{Part3_CrossLanguage/Python/patterns.py}; run \path{python3 -m unittest -v} from the Python folder.
+\item JavaScript: \path{Part3_CrossLanguage/JavaScript/patterns.test.js}; run \path{node --test patterns.test.js}.
+\item C++: \path{Part3_CrossLanguage/Cpp/patterns_test.cpp}; run \path{g++ -std=c++17 -O2 patterns_test.cpp -o patterns_test && ./patterns_test}.
+\end{itemize}
+
+\subsection{Actual results and comparison}
+\begin{tabularx}{\linewidth}{@{}p{1.0in}p{1.15in}p{1.25in}Y@{}}
+\toprule\textbf{Language} & \textbf{Result} & \textbf{Pattern coverage} & \textbf{Evidence}\\\midrule
+Python & 6 tests passed & Repository, Strategy, Observer & unittest output in evidence log.\\
+Java & Passed & Repository, Strategy, Observer & javac compilation and runtime assertions.\\
+JavaScript & Passed & Repository, Strategy, Observer & Node test output.\\
+C++ & Passed & Repository, Strategy, Observer & g++ C++17 compilation and runtime assertions.\\
+\bottomrule
+\end{tabularx}
+
+The test matrix contains 12 pattern/language combinations, all recorded as passing. Java interfaces and classes make contracts explicit but require more boilerplate; Python can express the same roles concisely; JavaScript functions/classes support callback-based observers; C++ offers interfaces through abstract classes and templates/callables but requires careful lifetime management. These are qualitative observations. No performance benchmark or language speed ranking was run.
+
+\section{LLM Records and Human Verification}
+The prompt summaries are stored in \path{prompts/part1_baseline_analysis_prompt.md}, \path{prompts/part2_refactoring_prompt.md}, and \path{prompts/part3_cross_language_prompt.md}. These are reconstructed summaries of the task, not exported raw provider logs. \path{data/llm_records.csv} records the stage, inputs, outputs, verification method, and limitations. Human verification consisted of source-path review, inspection of the refactoring diff, five structural tests, and the recorded cross-language tests. The full Spring Boot system was not launched; all such runtime claims remain unverified.
+
+\section{Findings, Contributions and References}
+\textbf{Findings.} The strongest baseline patterns are Microservices Architecture, API Gateway, Service Discovery, Layered Architecture (partially separated), Repository, and Client--Server. Dependency Injection and singleton bean scope are framework conventions rather than custom GoF implementations. The most defensible evolution is Service Layer extraction, Strategy for two patient-validation transports, and an Observer-based audit event. Shared database ownership, hard-coded secrets, broad Actuator exposure, and incomplete runtime verification remain limitations.
+
+\textbf{Contributions.} Team roster is confirmed; person-specific allocations were not provided. The team must replace the following shared-work placeholder with actual responsibilities before submission. No individual tasks are attributed without evidence.
+\begin{tabularx}{\linewidth}{@{}p{1.7in}p{1.5in}Y@{}}
+\toprule\textbf{Roll number} & \textbf{Name} & \textbf{Actual contribution (team to complete)}\\\midrule
+AM.EN.U4EAC23048 & Sai Rudra & found the project repo.\\
+AM.EN.U4EAC23033 & Sai Krishna & found the initial design pattrens.\\
+AM.EN.U4EAC23025 & Pavan Sai & found the initial design pattrens.\\
+AM.EN.U4EAC23042 & Siddhartha & modified and edited the founded pattrens.\\
+AM.EN.U4EAC23064 & Shradhey K & modified and edited the founded pattrens.\\
+\bottomrule
+\end{tabularx}
+
+\textbf{References.}
+\begin{enumerate}
+\item Risshhhiiii, \textit{Hospital Management System Using MicroServices And SpringBoot}, supplied repository snapshot and README, \url{https://github.com/Risshhhiiii/Hospital-Management-System-Using-MicroServices-And-SpringBoot}.
+\item Gamma, E., Helm, R., Johnson, R., and Vlissides, J., \textit{Design Patterns: Elements of Reusable Object-Oriented Software}. Addison-Wesley, 1994.
+\item Spring Boot Reference Documentation: \url{https://docs.spring.io/spring-boot/}.
+\item Spring Cloud Gateway Reference: \url{https://docs.spring.io/spring-cloud-gateway/reference/}.
+\item Spring Cloud Netflix / Eureka documentation: \url{https://docs.spring.io/spring-cloud-netflix/reference/}.
+\item Spring Data JPA Reference Documentation: \url{https://docs.spring.io/spring-data/jpa/reference/}.
+\end{enumerate}
+
+\section{Team Folder and Datasets}
+The submission folder follows the provided report template's requested organization, with A16-specific names:
+\begin{lstlisting}
+A16/
+  README.md
+  A16_Report.tex
+  A16_Report.pdf
+  A16_Report.docx
+  TEAM_A16.md
+  CONTRIBUTIONS.md
+  data/ pattern_inventory.csv, source_file_inventory.csv,
+        cross_language_test_matrix.csv, llm_records.csv
+  Part1_Baseline/ original_project/, baseline_analysis.md
+  Part2_Refactoring/ refactored_project/, diffs/, overlay/
+  Part3_CrossLanguage/ Java/, Python/, JavaScript/, Cpp/
+  prompts/ reconstructed prompt summaries
+  tests/ structural tests
+  evidence/ and verification/ recorded test/build results
+\end{lstlisting}
+Screenshots of the final GitHub repository should be captured by the team after uploading the folder; no screenshot is fabricated in this report.
+\end{document}

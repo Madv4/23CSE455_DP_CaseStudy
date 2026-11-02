@@ -1,0 +1,11 @@
+--- a/appointment-service/src/main/java/com/infosys/appointmentservice/Controller/AppointmentController.java
++++ b/appointment-service/src/main/java/com/infosys/appointmentservice/Controller/AppointmentController.java
+@@ -1,15 +1,18 @@
+- // Baseline: Hardcoded RestTemplate and WebClient calls inside controller
++ // Refactored CH02: Delegated to AppointmentService using Strategy Pattern & Resilience4j
++ @PostMapping("/book")
++ public ResponseEntity<Appointment> bookAppointment(@RequestBody Appointment appointment, 
++                                                     @RequestParam String strategy,
++                                                     @RequestHeader("Authorization") String token) {
++     return ResponseEntity.ok(appointmentService.createAppointment(appointment, strategy, token));
++ }

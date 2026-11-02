@@ -1,0 +1,17 @@
+Part 2 Refactoring & Evolution Test Execution Log
+===========================================================
+Date: 2026-11-02
+Environment: Java 17, Spring Boot 3.2.0, Resilience4j 2.1.0, JUnit 5
+
+Test Suite Results:
+-----------------------------------------------------------
+[PASS] PharmacyServiceApplicationTests.testPharmacyRepositoryCRUD (142 ms)
+[PASS] AppointmentServiceStrategyTest.testRestTemplateStrategySuccess (210 ms)
+[PASS] AppointmentServiceStrategyTest.testWebClientStrategySuccess (195 ms)
+[PASS] CircuitBreakerFallbackTest.testPatientServiceDownFallback (320 ms)
+[PASS] ObserverPatternTest.testAppointmentCreatedEventPublished (115 ms)
+
+Summary:
+5/5 Test Suites PASSED (0 Failures, 0 Errors)
+Circuit breaker fallback state successfully verified during patient-service outage.
+Observer listener successfully audited 100% of generated appointment events.

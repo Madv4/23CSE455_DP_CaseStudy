@@ -1,0 +1,13 @@
+pattern,language,check,status,evidence
+Repository,Python,"save/find, missing lookup, delete",PASS,unittest suite
+Strategy,Python,standard and senior fee calculations,PASS,unittest suite
+Observer,Python,subscriber receives event,PASS,unittest suite
+Repository,Java,save/find,PASS,javac + runtime assertions
+Strategy,Java,senior fee calculation,PASS,javac + runtime assertions
+Observer,Java,subscriber receives event,PASS,javac + runtime assertions
+Repository,JavaScript,save/find,PASS,Node.js assertions
+Strategy,JavaScript,standard and senior fee calculations,PASS,Node.js assertions
+Observer,JavaScript,subscriber receives event,PASS,Node.js assertions
+Repository,C++,save/find,PASS,g++ compile + assertions
+Strategy,C++,senior fee calculation,PASS,g++ compile + assertions
+Observer,C++,subscriber receives event,PASS,g++ compile + assertions
