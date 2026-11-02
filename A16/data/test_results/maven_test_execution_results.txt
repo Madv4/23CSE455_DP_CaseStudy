@@ -1,0 +1,19 @@
+MAVEN TEST EXECUTION & BUILD SUMMARY (Rishi GitHub Baseline)
+Repository: Hospital-Management-System-Using-MicroServices-And-SpringBoot
+
+Reactor Summary:
+EurekaServer ........................................ SUCCESS [ 3.412 s]
+hospital-gateway .................................... SUCCESS [ 2.890 s]
+auth-service ........................................ SUCCESS [ 4.120 s]
+patient-service ..................................... SUCCESS [ 3.850 s]
+appointment-service ................................. SUCCESS [ 4.015 s]
+
+Tests Executed:
+- com.infosys.eurekaserver.EurekaServerApplicationTests: 1 Passed
+- com.infosys.gateway.JwtAuthFilterTest: 3 Passed
+- com.infosys.authservice.AuthServiceTests: 4 Passed
+- com.infosys.patientservice.PatientServiceTests: 5 Passed
+- com.infosys.appointmentservice.AppointmentServiceTests: 4 Passed
+
+Total Tests run: 17, Failures: 0, Errors: 0, Skipped: 0
+Status: BUILD SUCCESS
